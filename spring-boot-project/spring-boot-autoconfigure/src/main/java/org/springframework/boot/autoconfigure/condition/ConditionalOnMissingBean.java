@@ -70,6 +70,7 @@ public @interface ConditionalOnMissingBean {
 	 * of each class specified is contained in the {@link BeanFactory}.
 	 * @return the class types of beans to check
 	 */
+	////Bean 类型集合，类型安全的属性设置
 	Class<?>[] value() default {};
 
 	/**
@@ -77,6 +78,7 @@ public @interface ConditionalOnMissingBean {
 	 * bean of each class specified is contained in the {@link BeanFactory}.
 	 * @return the class type names of beans to check
 	 */
+	//Bean 类名集合
 	String[] type() default {};
 
 	/**
@@ -84,6 +86,7 @@ public @interface ConditionalOnMissingBean {
 	 * @return the class types of beans to ignore
 	 * @since 1.2.5
 	 */
+	//在扫描匹配的bean的时候 忽略指定类型的bean
 	Class<?>[] ignored() default {};
 
 	/**
@@ -92,6 +95,7 @@ public @interface ConditionalOnMissingBean {
 	 * @return the class type names of beans to ignore
 	 * @since 1.2.5
 	 */
+	//在扫描匹配的bean的时候 忽略指定类型的bean
 	String[] ignoredType() default {};
 
 	/**
@@ -100,6 +104,7 @@ public @interface ConditionalOnMissingBean {
 	 * {@link BeanFactory}.
 	 * @return the class-level annotation types to check
 	 */
+	//Bean 声明注解类型集合
 	Class<? extends Annotation>[] annotation() default {};
 
 	/**
@@ -107,6 +112,7 @@ public @interface ConditionalOnMissingBean {
 	 * missing in the {@link BeanFactory}.
 	 * @return the names of beans to check
 	 */
+	//Bean 名称集合
 	String[] name() default {};
 
 	/**
@@ -114,6 +120,8 @@ public @interface ConditionalOnMissingBean {
 	 * considered.
 	 * @return the search strategy
 	 */
+	//层次性应用上下文搜索策略：当前、所有级联的父容器（但是不包括本容器自己）
+	// 、所有
 	SearchStrategy search() default SearchStrategy.ALL;
 
 	/**

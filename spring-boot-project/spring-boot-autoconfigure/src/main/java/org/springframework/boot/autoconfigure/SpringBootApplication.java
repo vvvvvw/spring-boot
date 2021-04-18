@@ -54,8 +54,9 @@ import org.springframework.data.repository.Repository;
 @Inherited
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+//添加了排除的TypeFilter 实现： TypeExcludeFilter、和 AutoConfigurationExcludeFilter
+@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class /*由 Spring Boot 1.4 引入，用于查找BeanFactorγ 中已经注册的 TypeExcludeFilterBean 作为代理执行对象*/),
+		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class/*Spring Boot 1.5 开始支持，用于排除其他同时标注 @Configuration和@EnableAutoConfiguration的类*/) })
 public @interface SpringBootApplication {
 
 	/**

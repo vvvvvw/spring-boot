@@ -40,6 +40,8 @@ import org.springframework.util.StringUtils;
  * @see ConditionalOnClass
  * @see ConditionalOnMissingClass
  */
+//获取META-INF/spring-autoconfigure-metadata.properties文件中的 autoConfiguration类名.ConditionalOnClass 属性，
+//如果该属性中的所有类都能被加载到，则满足装配条件，否则只要有一个类不能被加载，则过滤
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class OnClassCondition extends FilteringSpringBootCondition {
 
@@ -194,8 +196,10 @@ class OnClassCondition extends FilteringSpringBootCondition {
 				AutoConfigurationMetadata autoConfigurationMetadata) {
 			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];
 			for (int i = start; i < end; i++) {
+				//遍历autoConfiguration类
 				String autoConfigurationClass = autoConfigurationClasses[i];
 				if (autoConfigurationClass != null) {
+					//获取在 META-INF/spring-autoconfigure-metadata.properties文件中的 autoConfiguration类名.ConditionalOnClass 属性
 					String candidates = autoConfigurationMetadata.get(autoConfigurationClass, "ConditionalOnClass");
 					if (candidates != null) {
 						outcomes[i - start] = getOutcome(candidates);
@@ -211,6 +215,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 					return getOutcome(candidates, this.beanClassLoader);
 				}
 				for (String candidate : StringUtils.commaDelimitedListToStringArray(candidates)) {
+					//依次遍历candidate，判断是否符合条件
 					ConditionOutcome outcome = getOutcome(candidate, this.beanClassLoader);
 					if (outcome != null) {
 						return outcome;

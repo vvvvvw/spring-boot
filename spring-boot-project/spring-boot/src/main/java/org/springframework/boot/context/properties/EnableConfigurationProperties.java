@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Import;
  * @author Dave Syer
  * @since 1.0.0
  */
+//支持 标注了@ConfigurationProperties注解的bean。
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

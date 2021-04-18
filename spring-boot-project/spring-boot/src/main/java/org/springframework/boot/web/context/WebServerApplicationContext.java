@@ -34,6 +34,7 @@ public interface WebServerApplicationContext extends ApplicationContext {
 	 * the server has not yet been created.
 	 * @return the web server
 	 */
+	//获取 WebServer,该接口返回的 WebServer 实例需要在服务器中启动后才能获取
 	WebServer getWebServer();
 
 	/**

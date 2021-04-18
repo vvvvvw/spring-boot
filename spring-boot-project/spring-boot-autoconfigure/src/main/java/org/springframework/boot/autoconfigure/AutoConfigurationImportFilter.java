@@ -53,7 +53,7 @@ public interface AutoConfigurationImportFilter {
 	 * be imported. The returned array must be the same size as the incoming
 	 * {@code autoConfigurationClasses} parameter. Entries containing {@code false} will
 	 * not be imported.
-	 */
+	 */ //autoConfigurationMetadata：META-INF/spring-autoconfigure-metadata.properties文件中的内容
 	boolean[] match(String[] autoConfigurationClasses, AutoConfigurationMetadata autoConfigurationMetadata);
 
 }

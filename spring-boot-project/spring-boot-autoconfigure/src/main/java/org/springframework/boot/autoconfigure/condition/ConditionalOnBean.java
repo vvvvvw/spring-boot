@@ -62,6 +62,7 @@ import org.springframework.context.annotation.Conditional;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Conditional(OnBeanCondition.class)
+//注意：ConditionalOnBean 仅匹配 BeanFactory中已处理的 BeanDefinition 的类型和名字
 public @interface ConditionalOnBean {
 
 	/**
@@ -69,6 +70,7 @@ public @interface ConditionalOnBean {
 	 * of all classes specified are contained in the {@link BeanFactory}.
 	 * @return the class types of beans to check
 	 */
+	////Bean 类型集合，类型安全的属性设置
 	Class<?>[] value() default {};
 
 	/**
@@ -76,6 +78,7 @@ public @interface ConditionalOnBean {
 	 * beans of all classes specified are contained in the {@link BeanFactory}.
 	 * @return the class type names of beans to check
 	 */
+	//Bean 类名集合
 	String[] type() default {};
 
 	/**
@@ -84,6 +87,7 @@ public @interface ConditionalOnBean {
 	 * {@link BeanFactory}.
 	 * @return the class-level annotation types to check
 	 */
+	//Bean 声明注解类型集合
 	Class<? extends Annotation>[] annotation() default {};
 
 	/**
@@ -91,6 +95,7 @@ public @interface ConditionalOnBean {
 	 * specified are contained in the {@link BeanFactory}.
 	 * @return the names of beans to check
 	 */
+	//Bean 名称集合
 	String[] name() default {};
 
 	/**
@@ -98,6 +103,8 @@ public @interface ConditionalOnBean {
 	 * considered.
 	 * @return the search strategy
 	 */
+	//层次性应用上下文搜索策略：当前、所有级联的父容器（但是不包括本容器自己）
+	// 、所有
 	SearchStrategy search() default SearchStrategy.ALL;
 
 	/**

@@ -41,6 +41,7 @@ public @interface ConditionalOnResource {
 	 * The resources that must be present.
 	 * @return the resource paths that must be present.
 	 */
+	//只有资源存在的时候 条件方可成立
 	String[] resources() default {};
 
 }

@@ -49,6 +49,7 @@ class AutoConfigurationSorter {
 			AutoConfigurationMetadata autoConfigurationMetadata) {
 		Assert.notNull(metadataReaderFactory, "MetadataReaderFactory must not be null");
 		this.metadataReaderFactory = metadataReaderFactory;
+		//从META-INF/spring-autoconfigure-metadata.properties中获取的资源信息
 		this.autoConfigurationMetadata = autoConfigurationMetadata;
 	}
 
@@ -57,13 +58,21 @@ class AutoConfigurationSorter {
 				this.autoConfigurationMetadata, classNames);
 		List<String> orderedClassNames = new ArrayList<>(classNames);
 		// Initially sort alphabetically
+		//首先根据类名的自然顺序排序
 		Collections.sort(orderedClassNames);
 		// Then sort by order
+		// 然后根据绝对排序值来排序,优先级从高到低
+		//1.META-INF/spring-autoconfigure-metadata.properties文件中的属性：{类名}.AutoConfigureOrder
+		//2.@AutoConfigureOrder的值
+		//3.默认值 0
 		orderedClassNames.sort((o1, o2) -> {
 			int i1 = classes.get(o1).getOrder();
 			int i2 = classes.get(o2).getOrder();
 			return Integer.compare(i1, i2);
 		});
+		//根据相对排序值来排序，优先级从高到低
+		//1.META-INF/spring-autoconfigure-metadata.properties文件中的属性：{类名}.AutoConfigureBefore和{类名}.AutoConfigureAfter
+		//2.@AutoConfigureBefore和@AutoConfigureAfter注解
 		// Then respect @AutoConfigureBefore @AutoConfigureAfter
 		orderedClassNames = sortByAnnotation(classes, orderedClassNames);
 		return orderedClassNames;
@@ -104,6 +113,7 @@ class AutoConfigurationSorter {
 
 	private static class AutoConfigurationClasses {
 
+		//Map<传入构造器的类和标注在这些类上的@AutoConfigureBefore和@AutoConfigureAfter注解中指定的类（这个是级联获取的），类相关的元数据信息：注解和从META-INF/spring-autoconfigure-metadata.properties中获取的资源信息>
 		private final Map<String, AutoConfigurationClass> classes = new HashMap<>();
 
 		AutoConfigurationClasses(MetadataReaderFactory metadataReaderFactory,
@@ -200,11 +210,14 @@ class AutoConfigurationSorter {
 			return this.after;
 		}
 
+		//获取类上的绝对排序值（META-INF/spring-autoconfigure-metadata.properties优先于@AutoConfigureOrder的值），如果没有配置，则绝对排序值使用 默认值0
 		private int getOrder() {
+			//首先判断META-INF/spring-autoconfigure-metadata.properties中是否 配置了  &{classname}.AutoConfigureOrder属性，如果配置了，则返回配置中的属性值
 			if (wasProcessed()) {
 				return this.autoConfigurationMetadata.getInteger(this.className, "AutoConfigureOrder",
 						AutoConfigureOrder.DEFAULT_ORDER);
 			}
+			//返回 @AutoConfigureOrder注解中的值
 			Map<String, Object> attributes = getAnnotationMetadata()
 					.getAnnotationAttributes(AutoConfigureOrder.class.getName());
 			return (attributes != null) ? (Integer) attributes.get("value") : AutoConfigureOrder.DEFAULT_ORDER;

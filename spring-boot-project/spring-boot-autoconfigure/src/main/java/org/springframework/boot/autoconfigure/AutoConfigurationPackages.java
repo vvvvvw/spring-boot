@@ -70,6 +70,7 @@ public abstract class AutoConfigurationPackages {
 	 * @return a list of auto-configuration packages
 	 * @throws IllegalStateException if auto-configuration is not enabled
 	 */
+	//从 返回的bean中获取 @AutoConfigurationPackages注解中指定的包名
 	public static List<String> get(BeanFactory beanFactory) {
 		try {
 			return beanFactory.getBean(BEAN, BasePackages.class).get();
@@ -90,8 +91,12 @@ public abstract class AutoConfigurationPackages {
 	 * @param registry the bean definition registry
 	 * @param packageNames the package names to set
 	 */
+	//注册 BasePackagesBeanDefinition（实现了GenericBeanDefinition，存储的是 包名列表） 到 spring容器中
+	//bean 名字是org.springframework.boot.autoconfigure.AutoConfigurationPackages
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
 		if (registry.containsBeanDefinition(BEAN)) {
+			//如果有多个class 引入了 @AutoConfigurationPackage注解 导致多次调用 register函数，那么 第二次引用第一次生成的bean，并调整
+			//其中的参数
 			BasePackagesBeanDefinition beanDefinition = (BasePackagesBeanDefinition) registry.getBeanDefinition(BEAN);
 			beanDefinition.addBasePackages(packageNames);
 		}
@@ -132,7 +137,8 @@ public abstract class AutoConfigurationPackages {
 			for (Class<?> basePackageClass : attributes.getClassArray("basePackageClasses")) {
 				packageNames.add(basePackageClass.getPackage().getName());
 			}
-			if (packageNames.isEmpty()) {
+			if (packageNames.isEmpty()) { //如果basePackages和basePackageClasses参数都没有，
+				                          // 则使用标注了@AutoConfigurationPackage注解的类所在的包
 				packageNames.add(ClassUtils.getPackageName(metadata.getClassName()));
 			}
 			this.packageNames = Collections.unmodifiableList(packageNames);

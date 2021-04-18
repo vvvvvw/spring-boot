@@ -86,7 +86,10 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		//required为true：表示 当前类添加了@ConditionalOnWebApplication注解，如果添加@ConditionalOnWebApplication注解的话，那
+		//自然就是 添加了@ConditionalOnNotWebApplication注解
 		boolean required = metadata.isAnnotated(ConditionalOnWebApplication.class.getName());
+		//判断当前spring应用是否为web应用
 		ConditionOutcome outcome = isWebApplication(context, metadata, required);
 		if (required && !outcome.isMatch()) {
 			return ConditionOutcome.noMatch(outcome.getConditionMessage());
@@ -109,6 +112,7 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 		}
 	}
 
+	//判断 当前应用是否为 servlet或者reactive应用
 	private ConditionOutcome isAnyWebApplication(ConditionContext context, boolean required) {
 		ConditionMessage.Builder message = ConditionMessage.forCondition(ConditionalOnWebApplication.class,
 				required ? "(required)" : "");
@@ -124,20 +128,25 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 				message.because(servletOutcome.getMessage()).append("and").append(reactiveOutcome.getMessage()));
 	}
 
+	//判断标准：
 	private ConditionOutcome isServletWebApplication(ConditionContext context) {
 		ConditionMessage.Builder message = ConditionMessage.forCondition("");
+		//classpatch下是否存在org.springframework.web.context.support.GenericWebApplicationContext类型
 		if (!ClassNameFilter.isPresent(SERVLET_WEB_APPLICATION_CLASS, context.getClassLoader())) {
 			return ConditionOutcome.noMatch(message.didNotFind("servlet web application classes").atAll());
 		}
+		//上下文中是否存在 scope为session 的 Bean ，如果存在，则说明当前应用属于 Servlet Web 应用
 		if (context.getBeanFactory() != null) {
 			String[] scopes = context.getBeanFactory().getRegisteredScopeNames();
 			if (ObjectUtils.containsElement(scopes, "session")) {
 				return ConditionOutcome.match(message.foundExactly("'session' scope"));
 			}
 		}
+		//判断 Spring应用上下文所关联 Environment 是否为 ConfigurableWebEnvironment类型，如果是，则说明当前应用属于 Servlet Web 应用
 		if (context.getEnvironment() instanceof ConfigurableWebEnvironment) {
 			return ConditionOutcome.match(message.foundExactly("ConfigurableWebEnvironment"));
 		}
+		//判断ResourceLoader是否为 WebApplicationContext类型，如果是，则说明当前应用属于 Servlet Web 应用
 		if (context.getResourceLoader() instanceof WebApplicationContext) {
 			return ConditionOutcome.match(message.foundExactly("WebApplicationContext"));
 		}
@@ -146,12 +155,15 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	private ConditionOutcome isReactiveWebApplication(ConditionContext context) {
 		ConditionMessage.Builder message = ConditionMessage.forCondition("");
+		//判断classpatch下是否存在org.springframework.web.reactive.HandlerResult类
 		if (!ClassNameFilter.isPresent(REACTIVE_WEB_APPLICATION_CLASS, context.getClassLoader())) {
 			return ConditionOutcome.noMatch(message.didNotFind("reactive web application classes").atAll());
 		}
+		//判断 Spring应用上下文所关联 Environment 是否为 ConfigurableReactiveWebEnvironment类型，如果是，则说明当前应用属于 Reactive Web 应用
 		if (context.getEnvironment() instanceof ConfigurableReactiveWebEnvironment) {
 			return ConditionOutcome.match(message.foundExactly("ConfigurableReactiveWebEnvironment"));
 		}
+		//判断 ResourceLoader 是否为 ReactiveWebApplicationContext类型，如果是，则说明当前应用属于 Reactive Web 应用
 		if (context.getResourceLoader() instanceof ReactiveWebApplicationContext) {
 			return ConditionOutcome.match(message.foundExactly("ReactiveWebApplicationContext"));
 		}

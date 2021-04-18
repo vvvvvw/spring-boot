@@ -32,6 +32,7 @@ import org.springframework.core.type.filter.TypeFilter;
  * @author Stephane Nicoll
  * @since 1.5.0
  */
+/*Spring Boot 1.5 开始支持，用于排除其他同时标注 @Configuration和@EnableAutoConfiguration的类*/
 public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoaderAware {
 
 	private ClassLoader beanClassLoader;
@@ -43,6 +44,7 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 		this.beanClassLoader = beanClassLoader;
 	}
 
+	//同时标注 @Configuration和@EnableAutoConfiguration的类
 	@Override
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {

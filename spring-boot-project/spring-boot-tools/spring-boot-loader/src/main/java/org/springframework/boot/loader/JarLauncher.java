@@ -34,6 +34,8 @@ import org.springframework.boot.loader.archive.ExplodedArchive;
  * @author Madhura Bhave
  * @since 1.0.0
  */
+
+//jar方式启动引导类
 public class JarLauncher extends ExecutableArchiveLauncher {
 
 	private static final String DEFAULT_CLASSPATH_INDEX_LOCATION = "BOOT-INF/classpath.idx";
@@ -74,6 +76,8 @@ public class JarLauncher extends ExecutableArchiveLauncher {
 		return false;
 	}
 
+	//Archive.Entry既可以是 jar包（实现类是 JarFileArchive.JarFileEntrγ，基于 java.util.jar.JarEntry来实现，表示 FAT JAR 嵌入资源）
+	//也可以是 文件或者目录(实现类是 ExplodedArchive.FileEntry,基于文件系统实现)
 	@Override
 	protected boolean isSearchCandidate(Archive.Entry entry) {
 		return entry.getName().startsWith("BOOT-INF/");

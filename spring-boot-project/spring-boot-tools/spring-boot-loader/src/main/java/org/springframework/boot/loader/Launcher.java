@@ -50,10 +50,17 @@ public abstract class Launcher {
 	 */
 	protected void launch(String[] args) throws Exception {
 		if (!isExploded()) {
+			//扩展 java.net.URLStreamHandler（具体原理可以看 URL#getURLStreamHandler），将org.springframework.boot.loader.jar.Handler替换 jdk默认的jar类型url处理器（sun.net.www.protocol.jar.Handler）
+			//原因：java默认除了classpath、file、vfsfile、vfs这几种协议，其他资源都是通过URLResource加载的，而URLResource默认使用的是 URL类加载资源，URL类对于每种协议的处理都是通过 URLStreamHandler机制扩展的
+			//spring Boot fat jar 是jar文件，所以不是classpath、file、vfsfile、vfs这几种协议，而spring Boot fat jar除包含传统 java中的资源外，还包含依赖的 JAR文件，换言之，它是一个独立的应用归档文件（内部的boot-inf等目录可以用来查找需要的类），java 默认的处理jar协议的URLStreamHandler （sun.net.www.protocol.jar.Handler）是不知道从jar中的boot-inf等等文件夹中扫描 需要的类的，故需要替换实现。
 			JarFile.registerUrlProtocolHandler();
 		}
+		//创建 ClassLoader(并根据不同的介质类型创建不同的Archive实例并设置符合条件的classpath（对于jarLauncher来说，classpath为BOOT-INF/classes／和BOOT-INF/lib/*；对于warLauncher来说，classpath为WEB-INF/classes/、WEB-INF/lib/* 和 WEB-INF/lib-provided/*（属于 spring BootWar Launcher 定制实现，WEB-INF/lib-provided目录存放的是＜scope>provided</scope＞的 JAR 文件，原因：
+		//传统的 Servlet 应用的 Class Path 路径仅关注 WEB-INF/classes／和WEB-INF/lib目录，因此， WEB-INF/lib-provided／中的 JAR 将被 Servlet 容器忽略，如 Servlet api（在传统的servlet项目中由Servlet 容器提供）。因此，spring boot这样设计的好处在于，打包后的 WAR文件能够在 Servlet容器中兼容运行（当然 Spring Boot WebFlux 应用除外）。总而言之，打包 WAR 文件是一种兼容措施，既能
+		//通过WarLauncher直接启动，又能兼容 Servlet 容器环境。 因此， )
 		ClassLoader classLoader = createClassLoader(getClassPathArchivesIterator());
 		String jarMode = System.getProperty("jarmode");
+		//调用实际启动类的main方法（实际启动类来自manifest.mf的Start-Class属性（这个逻辑是由ExecutableArchiveLauncher实现，无论是jarlauncher还是warlauncher都没有覆盖，所以无论是jarlauncher还是warlauncher实际运行的类都是来自start-class属性））
 		String launchClass = (jarMode != null && !jarMode.isEmpty()) ? JAR_MODE_LAUNCHER : getMainClass();
 		launch(args, launchClass, classLoader);
 	}
@@ -115,6 +122,7 @@ public abstract class Launcher {
 	 * @param classLoader the classloader
 	 * @return the main method runner
 	 */
+	//方法的实际执行者为 MainMethodRunner的run（） 方法
 	protected MainMethodRunner createMainMethodRunner(String mainClass, String[] args, ClassLoader classLoader) {
 		return new MainMethodRunner(mainClass, args);
 	}
@@ -148,6 +156,7 @@ public abstract class Launcher {
 		throw new IllegalStateException("Unexpected call to getClassPathArchives()");
 	}
 
+	//通过当前 Launcher 所在的介质（是 JAR 归档文件实现 还是解压 目录实现）来返回相应的archive实例（JarFileArchive或者ExplodedArchive）
 	protected final Archive createArchive() throws Exception {
 		ProtectionDomain protectionDomain = getClass().getProtectionDomain();
 		CodeSource codeSource = protectionDomain.getCodeSource();

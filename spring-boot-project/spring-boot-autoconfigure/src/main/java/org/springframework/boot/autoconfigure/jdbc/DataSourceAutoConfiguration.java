@@ -60,10 +60,11 @@ import org.springframework.util.StringUtils;
 		DataSourceInitializationConfiguration.SharedCredentialsDataSourceInitializationConfiguration.class })
 public class DataSourceAutoConfiguration {
 
+
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(EmbeddedDatabaseCondition.class)
 	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
-	@Import(EmbeddedDataSourceConfiguration.class)
+	@Import(EmbeddedDataSourceConfiguration.class) /*//如果如果当前classpath下存在有内置数据库的驱动类，则激活EmbeddedDatabaseConfiguration*/
 	protected static class EmbeddedDatabaseConfiguration {
 
 	}
@@ -136,6 +137,7 @@ public class DataSourceAutoConfiguration {
 			if (anyMatches(context, metadata, this.pooledCondition)) {
 				return ConditionOutcome.noMatch(message.foundExactly("supported pooled data source"));
 			}
+			//遍历内置数据库 枚举，如果当前classpath下存在有内置数据库的驱动类，则返回匹配成功
 			EmbeddedDatabaseType type = EmbeddedDatabaseConnection.get(context.getClassLoader()).getType();
 			if (type == null) {
 				return ConditionOutcome.noMatch(message.didNotFind("embedded database").atAll());

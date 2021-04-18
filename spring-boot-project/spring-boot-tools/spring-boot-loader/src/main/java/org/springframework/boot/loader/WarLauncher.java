@@ -28,6 +28,8 @@ import org.springframework.boot.loader.archive.Archive.Entry;
  * @author Andy Wilkinson
  * @since 1.0.0
  */
+//WarLauncher 和Jarlauncher 的差异甚小，两者均继承于 ExecutableArchivelauncher， 并使用
+//JarFileArchive和ExplodedArchive 管理归档文件和解压目录两种资源.其主要区别在于项目类文件和JAR Class Path 路径的不同
 public class WarLauncher extends ExecutableArchiveLauncher {
 
 	public WarLauncher() {
@@ -47,6 +49,7 @@ public class WarLauncher extends ExecutableArchiveLauncher {
 		return entry.getName().startsWith("WEB-INF/");
 	}
 
+	//WEB-INF/classes/、WEB-INF/lib/* 和 WEB-INF/lib-provided/*均为 WarLauncher的Classpath
 	@Override
 	public boolean isNestedArchive(Archive.Entry entry) {
 		if (entry.isDirectory()) {

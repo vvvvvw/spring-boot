@@ -123,6 +123,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 
 		MISSING {
 
+			//判断 classname对应的类型是否能被classLoader加载到
 			@Override
 			public boolean matches(String className, ClassLoader classLoader) {
 				return !isPresent(className, classLoader);

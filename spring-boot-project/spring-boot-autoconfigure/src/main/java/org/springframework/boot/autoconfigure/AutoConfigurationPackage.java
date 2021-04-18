@@ -34,6 +34,11 @@ import org.springframework.context.annotation.Import;
  * @since 1.3.0
  * @see AutoConfigurationPackages
  */
+
+/**
+ * @AutoConfigurationPackage 可以注册要扫描的包，如果没有指定 basePackages或者basePackageClasses属性，那么就扫描标注了本注解
+ * 的类所在的包
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

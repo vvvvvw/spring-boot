@@ -47,6 +47,7 @@ import org.springframework.core.type.filter.TypeFilter;
  * @author Phillip Webb
  * @since 1.4.0
  */
+/*由 Spring Boot 1.4 引入，用于查找BeanFactorγ 中已经注册的 TypeExcludeFilterBean 作为代理执行对象*/
 public class TypeExcludeFilter implements TypeFilter, BeanFactoryAware {
 
 	private BeanFactory beanFactory;

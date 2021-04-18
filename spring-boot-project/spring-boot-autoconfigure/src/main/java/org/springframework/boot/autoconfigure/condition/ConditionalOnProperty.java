@@ -89,6 +89,7 @@ import org.springframework.core.env.Environment;
  * @author Phillip Webb
  * @since 1.1.0
  */
+//用于检查指定的属性的值是否满足预期，属性来自org.springframework.core.env.Environment
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Documented
@@ -99,6 +100,7 @@ public @interface ConditionalOnProperty {
 	 * Alias for {@link #name()}.
 	 * @return the names
 	 */
+	//name （） 的别名，参考 name （） 说明
 	String[] value() default {};
 
 	/**
@@ -119,6 +121,7 @@ public @interface ConditionalOnProperty {
 	 * to separate words (e.g. {@code my-long-property}).
 	 * @return the names
 	 */
+	//如果 prefix()不为空，则完整配置属性名称 为 prefix() + name() ，否则为 name()的内容
 	String[] name() default {};
 
 	/**
@@ -126,6 +129,7 @@ public @interface ConditionalOnProperty {
 	 * specified, the property must <strong>not</strong> be equal to {@code false}.
 	 * @return the expected value
 	 */
+	//表示期望的配置属性的值，如果没有指定havingValue()，那么就表示属性值一定不能是false
 	String havingValue() default "";
 
 	/**
@@ -133,6 +137,7 @@ public @interface ConditionalOnProperty {
 	 * {@code false}.
 	 * @return if should match if the property is missing
 	 */
+	//默认是否匹配，用于判断当属性值不存在时判断是否匹配
 	boolean matchIfMissing() default false;
 
 }
