@@ -35,7 +35,8 @@ import org.springframework.core.annotation.AliasFor;
  * <p>
  * Note that contrary to {@code @Value}, SpEL expressions are not evaluated since property
  * values are externalized.
- *
+ * 绑定是通过调用被注解类的setter方法 或者 通过被调用注解类的构造器（如果同时加上了@ConstructorBinding注解的话） 实现的
+ * 注意：和@Value注解不同，@ConfigurationProperties注解是不会解析 外部配置中的SpEL表达式的
  * @author Dave Syer
  * @since 1.0.0
  * @see ConfigurationPropertiesScan
