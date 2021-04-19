@@ -205,7 +205,7 @@ public class SpringApplication {
 
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
 
-	private Set<Class<?>> primarySources;
+	private Set<Class<?>> primarySources; //从构造函数传入的source Configuration
 
 	private Set<String> sources = new LinkedHashSet<>();
 
