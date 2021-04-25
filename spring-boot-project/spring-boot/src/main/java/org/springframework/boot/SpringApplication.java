@@ -919,6 +919,7 @@ public class SpringApplication {
 	}
 
 	SpringBootExceptionHandler getSpringBootExceptionHandler() {
+		//判断是否为主线程
 		if (isMainThread(Thread.currentThread())) {
 			return SpringBootExceptionHandler.forCurrentThread();
 		}
@@ -926,6 +927,10 @@ public class SpringApplication {
 	}
 
 	private boolean isMainThread(Thread currentThread) {
+		//todo 判断当前线程名称是否为“ restartedMain in ”的逻辑分支，是因为应用依赖 org.spring.framework.boot:spring-boot-devtools 后，
+		// 当 spring-boot-devtools 认为应用需要重启 ，将启动
+		//org.springframework.boot devtools.restart.RestartLauncher 钱程，该线程的名称为
+		//restartedMain ”
 		return ("main".equals(currentThread.getName()) || "restartedMain".equals(currentThread.getName()))
 				&& "main".equals(currentThread.getThreadGroup().getName());
 	}

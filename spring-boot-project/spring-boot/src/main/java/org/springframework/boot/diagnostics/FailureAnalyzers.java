@@ -53,6 +53,7 @@ final class FailureAnalyzers implements SpringBootExceptionReporter {
 
 	private final ClassLoader classLoader;
 
+	//FailureAnalyzer组合类
 	private final List<FailureAnalyzer> analyzers;
 
 	FailureAnalyzers(ConfigurableApplicationContext context) {

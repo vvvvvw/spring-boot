@@ -63,6 +63,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 	@Override
 	public void uncaughtException(Thread thread, Throwable ex) {
 		try {
+			//如果这个异常应该由 parent处理，且parent不为null，则把异常传给parent
 			if (isPassedToParent(ex) && this.parent != null) {
 				this.parent.uncaughtException(thread, ex);
 			}
@@ -123,6 +124,7 @@ class SpringBootExceptionHandler implements UncaughtExceptionHandler {
 		protected SpringBootExceptionHandler initialValue() {
 			SpringBootExceptionHandler handler = new SpringBootExceptionHandler(
 					Thread.currentThread().getUncaughtExceptionHandler());
+			//设置为 线程 默认UncaughtException处理器
 			Thread.currentThread().setUncaughtExceptionHandler(handler);
 			return handler;
 		}

@@ -23,6 +23,12 @@ import java.lang.reflect.Method;
  *
  * @author Phillip Webb
  */
+
+/**
+ * 当 spring-boot-devtools 认为应用需要重启 ，将启动
+ * org.springframework.boot devtools.restart.RestartLauncher 钱程，并将该线程的名称命名为
+ * restartedMain ”
+ */
 class RestartLauncher extends Thread {
 
 	private final String mainClassName;

@@ -31,6 +31,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 1.4.1
  */
+//用于简化Spring Boot 应用启动参数
 public class DefaultApplicationArguments implements ApplicationArguments {
 
 	private final Source source;
