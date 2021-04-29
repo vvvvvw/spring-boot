@@ -371,19 +371,23 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		//获取或者创建环境变量
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		//配置环境变量，主要包括PropertySources和Profiles
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
-		listeners.environmentPrepared(bootstrapContext, environment);
+		listeners.environmentPrepared(bootstrapContext, environment);//listeners.environmentPrepared
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		configureAdditionalProfiles(environment);
 		Assert.state(!environment.containsProperty("spring.main.environment-prefix"),
 				"Environment prefix cannot be set via properties.");
+		//将环境绑定到 SpringApplication
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
 		}
+		//新建一个ConfigurationPropertySourcesPropertySource 对象并附加到 environment的PropertySource列表的第一位
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
@@ -487,6 +491,7 @@ public class SpringApplication {
 		return instances;
 	}
 
+	//根据不同的 webApplicationType创建不同类型的环境
 	private ConfigurableEnvironment getOrCreateEnvironment() {
 		if (this.environment != null) {
 			return this.environment;
@@ -513,11 +518,14 @@ public class SpringApplication {
 	 * @see #configurePropertySources(ConfigurableEnvironment, String[])
 	 */
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+		//设置conversionService
 		if (this.addConversionService) {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
+		//配置PropertySources
 		configurePropertySources(environment, args);
+		//配置Profiles
 		configureProfiles(environment, args);
 	}
 
@@ -528,12 +536,14 @@ public class SpringApplication {
 	 * @param args arguments passed to the {@code run} method
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
 	 */
+	//配置PropertySources
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
 		MutablePropertySources sources = environment.getPropertySources();
 		if (!CollectionUtils.isEmpty(this.defaultProperties)) {
 			DefaultPropertiesPropertySource.addOrMerge(this.defaultProperties, sources);
 		}
 		if (this.addCommandLineProperties && args.length > 0) {
+			//添加解析命令行的PropertySource（SimpleCommandLinePropertySource）到第一位
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
 			if (sources.contains(name)) {
 				PropertySource<?> source = sources.get(name);
