@@ -98,6 +98,16 @@ import org.springframework.core.env.Environment;
  * @since 2.2.0
  * @see Endpoint
  */
+//Conditional注解，只有当指定类型的endpoint 可用的时候才能匹配，可用包括enabled和在端点暴露，
+// enabled 查找顺序（从高到低）：
+//1.首先返回management.endpoint.<name>.enabled这个配置属性的值；
+//2.如果没有配置management.endpoint.<name>.enabled，则返回management.endpoints.enabled-by-default属性的值
+//3.如果management.endpoints.enabled-by-default属性也没有配置，则返回标注在endpoint类上的@Endpoint或者
+// @EndpointExtension的enableByDefault属性（默认为true）
+//本端点是否暴露：获取management.endpoints.web.exposure.include、management.endpoints.web.exposure.exclude、
+//management.endpoints.jmx.exposure.include、management.endpoints.jmx.exposure.exclude属性判断本endpoint是否暴露
+//（web和jmx只要有一个暴露就暴露）
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Documented

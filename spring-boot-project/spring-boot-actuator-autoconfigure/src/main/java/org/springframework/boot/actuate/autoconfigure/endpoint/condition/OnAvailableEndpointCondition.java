@@ -40,6 +40,15 @@ import org.springframework.util.ConcurrentReferenceHashMap;
  * @author Phillip Webb
  * @see ConditionalOnAvailableEndpoint
  */
+//只有当指定类型的endpoint 可用的时候才能匹配，可用包括enabled和在端点暴露，
+// enabled 查找顺序（从高到低）：
+//1.首先返回management.endpoint.<name>.enabled这个配置属性的值；
+//2.如果没有配置management.endpoint.<name>.enabled，则返回management.endpoints.enabled-by-default属性的值
+//3.如果management.endpoints.enabled-by-default属性也没有配置，则返回标注在endpoint类上的@Endpoint或者
+// @EndpointExtension的enableByDefault属性（默认为true）
+//在指定端点暴露：获取management.endpoints.web.exposure.include、management.endpoints.web.exposure.exclude、
+//		//management.endpoints.jmx.exposure.include、management.endpoints.jmx.exposure.exclude属性判断本endpoint是否暴露
+//（web和jmx只要有一个暴露就暴露）
 class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 
 	private static final String JMX_ENABLED_KEY = "spring.jmx.enabled";
@@ -48,6 +57,11 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		//判断 端点是否enable
+		//查找顺序（从高到低）：
+//1.首先返回management.endpoint.<name>.enabled这个配置属性的值；
+//2.如果没有配置management.endpoint.<name>.enabled，则返回management.endpoints.enabled-by-default属性的值
+//3.如果management.endpoints.enabled-by-default属性也没有配置，则返回标注在endpoint类上的@Endpoint或者
 		ConditionOutcome enablementOutcome = getEnablementOutcome(context, metadata,
 				ConditionalOnAvailableEndpoint.class);
 		if (!enablementOutcome.isMatch()) {
@@ -55,12 +69,15 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 		}
 		ConditionMessage message = enablementOutcome.getConditionMessage();
 		Environment environment = context.getEnvironment();
+		//CLOUD_FOUNDRY云环境 特殊处理
 		if (CloudPlatform.CLOUD_FOUNDRY.isActive(environment)) {
 			return new ConditionOutcome(true, message.andCondition(ConditionalOnAvailableEndpoint.class)
 					.because("application is running on Cloud Foundry"));
 		}
 		EndpointId id = EndpointId.of(environment,
 				getEndpointAttributes(ConditionalOnAvailableEndpoint.class, context, metadata).getString("id"));
+		//获取management.endpoints.web.exposure.include、management.endpoints.web.exposure.exclude、
+		//management.endpoints.jmx.exposure.include、management.endpoints.jmx.exposure.exclude属性判断本endpoint是否暴露
 		Set<Exposure> exposures = getExposures(environment);
 		for (Exposure exposure : exposures) {
 			if (exposure.isExposed(id)) {
@@ -78,9 +95,12 @@ class OnAvailableEndpointCondition extends AbstractEndpointCondition {
 		Set<Exposure> exposures = exposuresCache.get(environment);
 		if (exposures == null) {
 			exposures = new HashSet<>(2);
+			//如果 spring.jmx.enabled为true
 			if (environment.getProperty(JMX_ENABLED_KEY, Boolean.class, false)) {
+				//management.endpoints.web.exposure.include 和 management.endpoints.web.exposure.exclude属性
 				exposures.add(new Exposure(environment, "jmx", DefaultIncludes.JMX));
 			}
+			//management.endpoints.jmx.exposure.include 和 management.endpoints.jmx.exposure.exclude属性
 			exposures.add(new Exposure(environment, "web", DefaultIncludes.WEB));
 			exposuresCache.put(environment, exposures);
 		}

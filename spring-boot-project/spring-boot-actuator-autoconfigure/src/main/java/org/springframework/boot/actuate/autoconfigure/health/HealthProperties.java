@@ -41,12 +41,15 @@ public abstract class HealthProperties {
 	/**
 	 * When to show components. If not specified the 'show-details' setting will be used.
 	 */
+	//在返回响应的时候是否应该展示 本group中所有的健康指示器 分别的健康信息
 	private Show showComponents;
 
 	/**
 	 * Roles used to determine whether or not a user is authorized to be shown details.
 	 * When empty, all authenticated users are authorized.
 	 */
+	//当showComponents或者showDetails的认证方式是Show.WHEN_AUTHORIZED(认证用户才能查看details或者各个子健康信息的时候)
+	//roles就用来表示 符合条件的认证用户
 	private Set<String> roles = new HashSet<>();
 
 	public Status getStatus() {

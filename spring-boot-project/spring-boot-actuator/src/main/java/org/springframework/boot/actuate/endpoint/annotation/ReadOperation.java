@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
  * @author Andy Wilkinson
  * @since 2.0.0
  */
+//endpoint 读操作
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

@@ -55,18 +55,22 @@ import org.springframework.util.ClassUtils;
 @Configuration(proxyBeanMethods = false)
 class HealthEndpointConfiguration {
 
+	//实例化StatusAggregator，健康状态聚合器，用于把多个status聚合成一个 status
 	@Bean
 	@ConditionalOnMissingBean
 	StatusAggregator healthStatusAggregator(HealthEndpointProperties properties) {
 		return new SimpleStatusAggregator(properties.getStatus().getOrder());
 	}
 
+	//实例化SimpleHttpCodeStatusMapper，用于health到http的状态码 之间的映射
 	@Bean
 	@ConditionalOnMissingBean
 	HttpCodeStatusMapper healthHttpCodeStatusMapper(HealthEndpointProperties properties) {
+		//SimpleHttpCodeStatusMapper：默认Status.DOWN和Status.OUT_OF_SERVICE 映射为503
 		return new SimpleHttpCodeStatusMapper(properties.getStatus().getHttpMapping());
 	}
 
+	//实例化HealthEndpointGroups，用于 HealthEndpointGroup的聚合
 	@Bean
 	@ConditionalOnMissingBean
 	HealthEndpointGroups healthEndpointGroups(ApplicationContext applicationContext,
@@ -74,6 +78,7 @@ class HealthEndpointConfiguration {
 		return new AutoConfiguredHealthEndpointGroups(applicationContext, properties);
 	}
 
+	//实例化HealthContributorRegistry，用于注册HealthContributor
 	@Bean
 	@ConditionalOnMissingBean
 	HealthContributorRegistry healthContributorRegistry(ApplicationContext applicationContext,
@@ -86,6 +91,7 @@ class HealthEndpointConfiguration {
 		return new AutoConfiguredHealthContributorRegistry(healthContributors, groups.getNames());
 	}
 
+	//实例化HealthEndpoint，用于 暴露用户注册的健康信息
 	@Bean
 	@ConditionalOnMissingBean
 	HealthEndpoint healthEndpoint(HealthContributorRegistry registry, HealthEndpointGroups groups) {

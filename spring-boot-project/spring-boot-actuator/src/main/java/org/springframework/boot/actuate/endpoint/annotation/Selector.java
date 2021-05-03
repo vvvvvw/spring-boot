@@ -32,6 +32,8 @@ import java.lang.annotation.Target;
  * @author Andy Wilkinson
  * @since 2.0.0
  */
+//使用@Selector注解操作方法的一个或多个参数，可以进一步endpoint定制路径，这样的参数作为路径变量添加到路径谓词，
+// 当调用端点操作时，将变量的值传递给操作方法
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -53,6 +55,7 @@ public @interface Selector {
 		 * Capture a single item. For example, in the case of a web application a single
 		 * path segment. The parameter value be converted from a {@code String} source.
 		 */
+		//只提取一个 path中的一段路径作为 参数值
 		SINGLE,
 
 		/**
@@ -60,6 +63,8 @@ public @interface Selector {
 		 * remaining path segments. The parameter value be converted from a
 		 * {@code String[]} source.
 		 */
+		//将所有未解析的剩余path都提取出来 作为参数值（string[]），注意，注解值为Match.ALL_REMAINING的@Selector 参数必须放在
+		//所有 @Selector 的最后一个
 		ALL_REMAINING
 
 	}

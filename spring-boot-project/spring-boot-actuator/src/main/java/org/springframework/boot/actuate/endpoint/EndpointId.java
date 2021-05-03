@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 2.0.6
  */
+//endpoint的标识符，只有字母和数字(如果有 .或者-，则打印异常日志)
 public final class EndpointId {
 
 	private static final Log logger = LogFactory.getLog(EndpointId.class);
@@ -47,6 +48,7 @@ public final class EndpointId {
 
 	private static final String MIGRATE_LEGACY_NAMES_PROPERTY = "management.endpoints.migrate-legacy-ids";
 
+	//endpoint的路径（在@Endpoint中指定的那个路径，相对的）
 	private final String value;
 
 	private final String lowerCaseValue;

@@ -64,6 +64,7 @@ public abstract class AbstractDiscoveredEndpoint<O extends Operation> extends Ab
 
 	@Override
 	public boolean wasDiscoveredBy(Class<? extends EndpointDiscoverer<?, ?>> discoverer) {
+		// 判断该 EndPoint 是否能被 EndpointDiscoverer 发现
 		return discoverer.isInstance(this.discoverer);
 	}
 

@@ -26,6 +26,7 @@ import org.springframework.boot.actuate.endpoint.ExposableEndpoint;
  * @since 2.0.0
  * @see PathMapper
  */
+//路径映射 Endpoint接口，实现类有DiscoveredControllerEndpoint、DiscoveredServletEndpoint、DiscoveredWebEndpoint
 @FunctionalInterface
 public interface PathMappedEndpoint {
 

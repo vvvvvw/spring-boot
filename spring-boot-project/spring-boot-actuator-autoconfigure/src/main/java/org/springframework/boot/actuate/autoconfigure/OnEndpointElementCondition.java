@@ -34,6 +34,12 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * @author Madhura Bhave
  * @since 2.0.0
  */
+/*
+用来检测是否启用了 指定类型的健康指示器，查找顺序(优先级从高到低)：
+1.首先返回management.health.<name>.enabled这个配置属性的值；
+2.如果没有配置management.health.<name>.enabled，则返回management.health.defaults.enabled属性的值
+3.如果management.health.defaults.enabled属性也没有配置，则返回true
+ */
 public abstract class OnEndpointElementCondition extends SpringBootCondition {
 
 	private final String prefix;
@@ -49,11 +55,14 @@ public abstract class OnEndpointElementCondition extends SpringBootCondition {
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
 		AnnotationAttributes annotationAttributes = AnnotationAttributes
 				.fromMap(metadata.getAnnotationAttributes(this.annotationType.getName()));
+		//获取value属性
 		String endpointName = annotationAttributes.getString("value");
+		//去环境变量中查找是否存在management.health.<endpointName>.enabled属性
 		ConditionOutcome outcome = getEndpointOutcome(context, endpointName);
 		if (outcome != null) {
 			return outcome;
 		}
+		//去环境变量中查找是否存在management.health.defaults.enabled属性
 		return getDefaultEndpointsOutcome(context);
 	}
 

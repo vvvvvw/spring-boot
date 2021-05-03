@@ -53,7 +53,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Documented
 @Endpoint
 @FilteredEndpoint(ControllerEndpointFilter.class)
-public @interface ControllerEndpoint {
+public @interface
+ControllerEndpoint {
 
 	/**
 	 * The id of the endpoint.

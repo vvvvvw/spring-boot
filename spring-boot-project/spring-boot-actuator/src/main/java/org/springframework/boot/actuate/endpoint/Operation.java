@@ -29,6 +29,7 @@ public interface Operation {
 	 * Returns the {@link OperationType type} of the operation.
 	 * @return the type
 	 */
+	//本option对应的OperationType类型
 	OperationType getType();
 
 	/**
@@ -36,6 +37,7 @@ public interface Operation {
 	 * @param context the context in to use when invoking the operation
 	 * @return the result of the operation, may be {@code null}
 	 */
+	//调用本 Operation，内部会调用到请求处理方法
 	Object invoke(InvocationContext context);
 
 }

@@ -57,12 +57,16 @@ public @interface EndpointExtension {
 	 * The filter class used to determine when the extension applies.
 	 * @return the filter class
 	 */
+	//指定 EndpointFilter，如果 EndpointExtension所属的 endpoint不满足EndpointFilter<E>
+	// （包括1.endpoint的类型不满足EndpointFilter的泛型；2. EndpointFilter.match(E endpoint)函数返回true），
+	// 则不把 这个endpoint扩展附加到该 endpoint
 	Class<? extends EndpointFilter<?>> filter();
 
 	/**
 	 * The class of the endpoint to extend.
 	 * @return the class endpoint to extend
 	 */
+	// EndpointExtension用来扩展的 endpoint
 	Class<?> endpoint() default Void.class;
 
 }

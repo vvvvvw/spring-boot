@@ -106,6 +106,9 @@ public class WebEndpointAutoConfiguration {
 				filters.getIfAvailable(Collections::emptyList));
 	}
 
+	//获取用于实现了PathMappedEndpoint接口的endpoint，
+	// 几个http endpoint都实现了PathMappedEndpoint接口：DiscoveredControllerEndpoint、DiscoveredServletEndpoint、DiscoveredWebEndpoint
+	//之后可以提供 路径到endpoint的映射关系
 	@Bean
 	@ConditionalOnMissingBean
 	public PathMappedEndpoints pathMappedEndpoints(Collection<EndpointsSupplier<?>> endpointSuppliers) {

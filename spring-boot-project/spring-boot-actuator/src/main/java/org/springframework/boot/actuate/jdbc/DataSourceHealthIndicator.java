@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
  * @author Arthur Kalimullin
  * @since 2.0.0
  */
+//使用一个给定的 sql 语句去测试数据库，如果没有指定，就简单判断一下是否能连上数据库
 public class DataSourceHealthIndicator extends AbstractHealthIndicator implements InitializingBean {
 
 	private DataSource dataSource;

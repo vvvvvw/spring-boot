@@ -34,6 +34,10 @@ import org.springframework.context.annotation.Conditional;
  * @author Stephane Nicoll
  * @since 2.0.0
  */
+//Conditional注解，只有当启用了 指定类型的健康指示器的时候才能匹配，查找顺序(优先级从高到低)：
+//1.首先返回management.health.<name>.enabled这个配置属性的值；
+//2.如果没有配置management.health.<name>.enabled，则返回management.health.defaults.enabled属性的值
+//3.如果management.health.defaults.enabled属性也没有配置，则返回true
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Documented

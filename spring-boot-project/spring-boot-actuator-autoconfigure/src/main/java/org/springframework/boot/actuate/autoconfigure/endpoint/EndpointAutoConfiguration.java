@@ -44,6 +44,7 @@ import org.springframework.core.env.Environment;
  * @author Chao Chang
  * @since 2.0.0
  */
+//负责将我们BeansEndpoint（提供/beans请求的响应结果），EnvironmentEndpoint（提供/env请求的响应结果）等实例注册到Spring容器中
 @Configuration(proxyBeanMethods = false)
 public class EndpointAutoConfiguration {
 

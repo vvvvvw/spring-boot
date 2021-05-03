@@ -48,10 +48,12 @@ public class InfoEndpoint {
 	@ReadOperation
 	public Map<String, Object> info() {
 		Info.Builder builder = new Info.Builder();
+		//遍历所有的infoContributors 获取信息
 		for (InfoContributor contributor : this.infoContributors) {
 			contributor.contribute(builder);
 		}
 		Info build = builder.build();
+		//返回 info信息
 		return build.getDetails();
 	}
 

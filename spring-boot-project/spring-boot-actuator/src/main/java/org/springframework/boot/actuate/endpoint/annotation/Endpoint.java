@@ -48,6 +48,7 @@ import org.springframework.boot.actuate.endpoint.EndpointId;
  * @see FilteredEndpoint
  * @see EndpointDiscoverer
  */
+//用来声明一个actuator端点，一个端点可以用于暴露（系统信息、操作入口等）信息
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -58,12 +59,14 @@ public @interface Endpoint {
 	 * @return the id
 	 * @see EndpointId
 	 */
+	//endpoint的标识符，只有字母和数字(其实也可以有 .或者-，但是会打印warn日志)
 	String id() default "";
 
 	/**
 	 * If the endpoint should be enabled or disabled by default.
 	 * @return {@code true} if the endpoint is enabled by default
 	 */
+	//本端点默认是否 enable
 	boolean enableByDefault() default true;
 
 }

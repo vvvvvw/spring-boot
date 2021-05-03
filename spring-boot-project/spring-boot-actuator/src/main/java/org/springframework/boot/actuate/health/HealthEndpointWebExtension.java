@@ -68,6 +68,7 @@ public class HealthEndpointWebExtension extends HealthEndpointSupport<HealthCont
 
 	public WebEndpointResponse<HealthComponent> health(ApiVersion apiVersion, SecurityContext securityContext,
 			boolean showAll, String... path) {
+		// 1. 实例化Health$Builder
 		HealthResult<HealthComponent> result = getHealth(apiVersion, securityContext, showAll, path);
 		if (result == null) {
 			return (Arrays.equals(path, NO_PATH))

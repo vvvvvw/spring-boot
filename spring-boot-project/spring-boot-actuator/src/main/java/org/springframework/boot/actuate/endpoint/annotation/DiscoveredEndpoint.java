@@ -26,6 +26,7 @@ import org.springframework.boot.actuate.endpoint.Operation;
  * @author Phillip Webb
  * @since 2.0.0
  */
+
 public interface DiscoveredEndpoint<O extends Operation> extends ExposableEndpoint<O> {
 
 	/**
@@ -33,12 +34,14 @@ public interface DiscoveredEndpoint<O extends Operation> extends ExposableEndpoi
 	 * @param discoverer the discoverer type
 	 * @return {@code true} if discovered using the specified discoverer
 	 */
+	//本endpoint是否可以被discoverer这个EndpointDiscoverer 发现
 	boolean wasDiscoveredBy(Class<? extends EndpointDiscoverer<?, ?>> discoverer);
 
 	/**
 	 * Return the source bean that was used to construct the {@link DiscoveredEndpoint}.
 	 * @return the source endpoint bean
 	 */
+	//获取本endpoint对应的EndpointBean
 	Object getEndpointBean();
 
 }

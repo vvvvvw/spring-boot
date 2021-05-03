@@ -27,18 +27,21 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 2.2.0
  */
+//HealthEndpointGroup管理器
 public interface HealthEndpointGroups {
 
 	/**
 	 * Return the primary group used by the endpoint.
 	 * @return the primary group (never {@code null})
 	 */
+	// 返回最终降级的HealthEndpointGroup（永远都不会返回null）
 	HealthEndpointGroup getPrimary();
 
 	/**
 	 * Return the names of any additional groups.
 	 * @return the additional group names
 	 */
+	//返回 本HealthEndpointGroups管理的所有 HealthEndpointGroup的分组名
 	Set<String> getNames();
 
 	/**
@@ -46,6 +49,7 @@ public interface HealthEndpointGroups {
 	 * @param name the name of the group
 	 * @return the {@link HealthEndpointGroup} or {@code null}
 	 */
+	//返回 分组名为name的 HealthEndpointGroup
 	HealthEndpointGroup get(String name);
 
 	/**

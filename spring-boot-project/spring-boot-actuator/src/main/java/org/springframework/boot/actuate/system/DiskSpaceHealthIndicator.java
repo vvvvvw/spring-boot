@@ -37,6 +37,7 @@ import org.springframework.util.unit.DataSize;
  * @author Stephane Nicoll
  * @since 2.0.0
  */
+//用于检测磁盘空间是否小于给定阈值，通过 File 类的 getUsableSpace() 方法实现
 public class DiskSpaceHealthIndicator extends AbstractHealthIndicator {
 
 	private static final Log logger = LogFactory.getLog(DiskSpaceHealthIndicator.class);

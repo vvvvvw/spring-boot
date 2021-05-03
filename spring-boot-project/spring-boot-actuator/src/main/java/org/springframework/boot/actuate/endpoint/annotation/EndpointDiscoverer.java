@@ -72,12 +72,15 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 
 	private final ApplicationContext applicationContext;
 
+	//全局EndpointFilter列表
 	private final Collection<EndpointFilter<E>> filters;
 
-	private final DiscoveredOperationsFactory<O> operationsFactory;
+	private final DiscoveredOperationsFactory<O> operationsFactory; //真实处理请求方法 解析工厂
 
+	////这个就是用来缓存之前已经被创建的EndpointBean实例，降低重复创建的
 	private final Map<EndpointBean, E> filterEndpoints = new ConcurrentHashMap<>();
 
+	//通过本EndpointDiscoverer最终发现的endpoints
 	private volatile Collection<E> endpoints;
 
 	/**
@@ -120,17 +123,21 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private Collection<E> discoverEndpoints() {
+		//从 spring容器中获取 @Endpoint注解的bean 并解析为EndpointBean
 		Collection<EndpointBean> endpointBeans = createEndpointBeans();
 		addExtensionBeans(endpointBeans);
+		//完成discoveredOperation的转换
 		return convertToEndpoints(endpointBeans);
 	}
 
 	private Collection<EndpointBean> createEndpointBeans() {
 		Map<EndpointId, EndpointBean> byId = new LinkedHashMap<>();
+		//找到我们注册的endpoint beans(加了@Endpoint注解的bean)
 		String[] beanNames = BeanFactoryUtils.beanNamesForAnnotationIncludingAncestors(this.applicationContext,
 				Endpoint.class);
 		for (String beanName : beanNames) {
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
+				//进行封装，预解析一些endpoint信息
 				EndpointBean endpointBean = createEndpointBean(beanName);
 				EndpointBean previous = byId.putIfAbsent(endpointBean.getId(), endpointBean);
 				Assert.state(previous == null, () -> "Found two endpoints with the id '" + endpointBean.getId() + "': '"
@@ -149,11 +156,15 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	private void addExtensionBeans(Collection<EndpointBean> endpointBeans) {
 		Map<EndpointId, EndpointBean> byId = endpointBeans.stream()
 				.collect(Collectors.toMap(EndpointBean::getId, Function.identity()));
+		//从spring中获取 标注了@EndpointExtension的bean
 		String[] beanNames = BeanFactoryUtils.beanNamesForAnnotationIncludingAncestors(this.applicationContext,
 				EndpointExtension.class);
 		for (String beanName : beanNames) {
+			//将 添加了 @EndpointExtension注解的bean 转换为 ExtensionBean
 			ExtensionBean extensionBean = createExtensionBean(beanName);
+			//查找 ExtensionBean所支持的endpoint
 			EndpointBean endpointBean = byId.get(extensionBean.getEndpointId());
+			//如果 EndpointExtension没有关联的 Endpoint定义的话，则抛出异常
 			Assert.state(endpointBean != null, () -> ("Invalid extension '" + extensionBean.getBeanName()
 					+ "': no endpoint found with id '" + extensionBean.getEndpointId() + "'"));
 			addExtensionBean(endpointBean, extensionBean);
@@ -167,10 +178,12 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private void addExtensionBean(EndpointBean endpointBean, ExtensionBean extensionBean) {
+		//如果endpointBean满足 在endpointextension上 指定的EndpointFilter
 		if (isExtensionExposed(endpointBean, extensionBean)) {
 			Assert.state(isEndpointExposed(endpointBean) || isEndpointFiltered(endpointBean),
 					() -> "Endpoint bean '" + endpointBean.getBeanName() + "' cannot support the extension bean '"
 							+ extensionBean.getBeanName() + "'");
+			//把 extensionBean添加到 endpointBean中
 			endpointBean.addExtension(extensionBean);
 		}
 	}
@@ -190,6 +203,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		EndpointId id = endpointBean.getId();
 		addOperations(indexed, id, endpointBean.getBean(), false);
 		if (endpointBean.getExtensions().size() > 1) {
+			//获取 endpoint扩展的 beanname
 			String extensionBeans = endpointBean.getExtensions().stream().map(ExtensionBean::getBeanName)
 					.collect(Collectors.joining(", "));
 			throw new IllegalStateException("Found multiple extensions for the endpoint bean "
@@ -210,10 +224,13 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		Collection<O> operations = this.operationsFactory.createOperations(id, target);
 		for (O operation : operations) {
 			OperationKey key = createOperationKey(operation);
+			//获取 OperationKey对应的所有Operation处理类中的最后一个
 			O last = getLast(indexed.get(key));
+			//如果replaceLast为true且 last不为空，则移除 最后一个 operation
 			if (replaceLast && replacedLast.add(key) && last != null) {
 				indexed.get(key).remove(last);
 			}
+			//添加 endpointextension 生成的operation
 			indexed.add(key, operation);
 		}
 	}
@@ -236,6 +253,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private boolean isExtensionExposed(EndpointBean endpointBean, ExtensionBean extensionBean) {
+		//判断 endpointBean是否 满足 在endpointextension上 指定的EndpointFilter
 		return isFilterMatch(extensionBean.getFilter(), endpointBean)
 				&& isExtensionTypeExposed(extensionBean.getBeanType());
 	}
@@ -251,7 +269,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	}
 
 	private boolean isEndpointExposed(EndpointBean endpointBean) {
-		return isFilterMatch(endpointBean.getFilter(), endpointBean) && !isEndpointFiltered(endpointBean)
+		return isFilterMatch(endpointBean.getFilter(), endpointBean) /*判断endpoint是否会被局部endpoint过滤掉*/ && !isEndpointFiltered(endpointBean)/*判断endpoint是否会被全局endpoint过滤掉*/
 				&& isEndpointTypeExposed(endpointBean.getBeanType());
 	}
 
@@ -261,11 +279,13 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	 * @param beanType the endpoint bean type
 	 * @return {@code true} if the endpoint is exposed
 	 */
+	//根据 类型来判断 这种类型的endpoint是否应该由 本EndpointDiscoverer来expose，本方法留给子类实现
 	protected boolean isEndpointTypeExposed(Class<?> beanType) {
 		return true;
 	}
-
+	//判断 endpointBean是否会被全局EndpointFilter过滤掉
 	private boolean isEndpointFiltered(EndpointBean endpointBean) {
+		//判断 endpointBean是否会被全局EndpointFilter过滤掉
 		for (EndpointFilter<E> filter : this.filters) {
 			if (!isFilterMatch(filter, endpointBean)) {
 				return true;
@@ -274,6 +294,8 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		return false;
 	}
 
+	//判断EndpointBean是否满足 EndpointFilter指定的条件，条件：
+	//1.endpoint的类型和 EndpointFilter<E>指定的泛型一致；2.EndpointFilter.match返回true
 	@SuppressWarnings("unchecked")
 	private boolean isFilterMatch(Class<?> filter, EndpointBean endpointBean) {
 		if (!isEndpointTypeExposed(endpointBean.getBeanType())) {
@@ -284,6 +306,7 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		}
 		E endpoint = getFilterEndpoint(endpointBean);
 		Class<?> generic = ResolvableType.forClass(EndpointFilter.class, filter).resolveGeneric(0);
+		//endpoint被filter过滤的条件有两个：1.endpoint的类型和 EndpointFilter<E>指定的泛型不一致；2.EndpointFilter.match返回true
 		if (generic == null || generic.isInstance(endpoint)) {
 			EndpointFilter<E> instance = (EndpointFilter<E>) BeanUtils.instantiateClass(filter);
 			return isFilterMatch(instance, endpoint);
@@ -301,6 +324,8 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 				.invokeAnd((f) -> f.match(endpoint)).get();
 	}
 
+
+	//根据 EndpointBean 创建相应类型的Endpoint实例（createEndpoint这个方法由子类实现）
 	private E getFilterEndpoint(EndpointBean endpointBean) {
 		E endpoint = this.filterEndpoints.get(endpointBean);
 		if (endpoint == null) {
@@ -394,18 +419,24 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	 */
 	private static class EndpointBean {
 
+		//endpoint的bean name
 		private final String beanName;
 
+		//endpoint的类型
 		private final Class<?> beanType;
 
+		//一个Supplier，返回endpoint的bean实例，() -> this.applicationContext.getBean(beanName);
 		private final Supplier<Object> beanSupplier;
 
+		//endpoint id
 		private final EndpointId id;
 
+		//本endpoint是否默认启用
 		private boolean enabledByDefault;
-
+		//本 endpoint类上标注的 @FilteredEndpoint注解引入的EndpointFilter
 		private final Class<?> filter;
 
+		//endpoint对应的EndpointExtension
 		private Set<ExtensionBean> extensions = new LinkedHashSet<>();
 
 		EndpointBean(Environment environment, String beanName, Class<?> beanType, Supplier<Object> beanSupplier) {
@@ -466,14 +497,16 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 	 */
 	private static class ExtensionBean {
 
+		//本ExtensionExtension的bean name
 		private final String beanName;
-
+		//本ExtensionExtension的类型
 		private final Class<?> beanType;
 
+		//一个Supplier，返回endpointExtension的bean实例，() -> this.applicationContext.getBean(beanName);
 		private final Supplier<Object> beanSupplier;
 
 		private final EndpointId endpointId;
-
+		//本ExtensionExtension指定的EndpointFilter
 		private final Class<?> filter;
 
 		ExtensionBean(Environment environment, String beanName, Class<?> beanType, Supplier<Object> beanSupplier) {

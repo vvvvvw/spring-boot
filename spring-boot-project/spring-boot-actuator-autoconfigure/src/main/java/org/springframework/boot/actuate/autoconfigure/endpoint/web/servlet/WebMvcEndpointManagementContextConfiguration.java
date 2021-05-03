@@ -54,6 +54,7 @@ import org.springframework.web.servlet.DispatcherServlet;
  * @author Phillip Webb
  * @since 2.0.0
  */
+//注册WebMvcEndpointHandlerMapping，用来处理 endpoint请求
 @ManagementContextConfiguration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass(DispatcherServlet.class)
@@ -68,10 +69,12 @@ public class WebMvcEndpointManagementContextConfiguration {
 			EndpointMediaTypes endpointMediaTypes, CorsEndpointProperties corsProperties,
 			WebEndpointProperties webEndpointProperties, Environment environment) {
 		List<ExposableEndpoint<?>> allEndpoints = new ArrayList<>();
+		//收集spring中的Endpoint实现类
 		Collection<ExposableWebEndpoint> webEndpoints = webEndpointsSupplier.getEndpoints();
 		allEndpoints.addAll(webEndpoints);
 		allEndpoints.addAll(servletEndpointsSupplier.getEndpoints());
 		allEndpoints.addAll(controllerEndpointsSupplier.getEndpoints());
+		//在属性文件中配置的 management.context-path属性，默认为/actuator
 		String basePath = webEndpointProperties.getBasePath();
 		EndpointMapping endpointMapping = new EndpointMapping(basePath);
 		boolean shouldRegisterLinksMapping = shouldRegisterLinksMapping(webEndpointProperties, environment, basePath);

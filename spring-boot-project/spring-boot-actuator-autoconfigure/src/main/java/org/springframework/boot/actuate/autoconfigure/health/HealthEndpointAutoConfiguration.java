@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Import;
  * @since 2.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnAvailableEndpoint(endpoint = HealthEndpoint.class)
+@ConditionalOnAvailableEndpoint(endpoint = HealthEndpoint.class) //用来判断endpoint是否是enabled状态（配置：management.endpoint.{endpointname}.enabled） 且 在相应的访问方式上暴露出来了（配置：management.endpoints.{访问方式}.exposure.include={要装配的端点，多个使用,分隔，如果要包含全部则使用*}）
 @EnableConfigurationProperties(HealthEndpointProperties.class)
 @Import({ HealthEndpointConfiguration.class, ReactiveHealthEndpointConfiguration.class,
 		HealthEndpointWebExtensionConfiguration.class, HealthEndpointReactiveWebExtensionConfiguration.class })

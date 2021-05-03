@@ -36,10 +36,13 @@ public final class WebOperationRequestPredicate {
 
 	private static final Pattern ALL_REMAINING_PATH_SEGMENTS_VAR_PATTERN = Pattern.compile("^.*\\{\\*(.+?)}$");
 
+	//端点路径/{参数名1}/{参数名2}/.../{*注解值为ALL_REMAINING的@Selector参数名}
 	private final String path;
 
+	//注解值为ALL_REMAINING的@Selector参数名
 	private final String matchAllRemainingPathSegmentsVariable;
 
+	//端点路径/{*}/{*}/.../{**}
 	private final String canonicalPath;
 
 	private final WebEndpointHttpMethod httpMethod;

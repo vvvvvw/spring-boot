@@ -51,6 +51,7 @@ abstract class DiscoveredOperationsFactory<O extends Operation> {
 	private static final Map<OperationType, Class<? extends Annotation>> OPERATION_TYPES;
 
 	static {
+		//默认operation注解
 		Map<OperationType, Class<? extends Annotation>> operationTypes = new EnumMap<>(OperationType.class);
 		operationTypes.put(OperationType.READ, ReadOperation.class);
 		operationTypes.put(OperationType.WRITE, WriteOperation.class);
@@ -88,6 +89,7 @@ abstract class DiscoveredOperationsFactory<O extends Operation> {
 		}
 		DiscoveredOperationMethod operationMethod = new DiscoveredOperationMethod(method, operationType,
 				annotation.asAnnotationAttributes());
+		//OperationInvoker反射类，内部会把 对operator的invoke方法的调用 转化为 对operationMethod的调用
 		OperationInvoker invoker = new ReflectiveOperationInvoker(target, operationMethod, this.parameterValueMapper);
 		invoker = applyAdvisors(endpointId, operationMethod, invoker);
 		return createOperation(endpointId, operationMethod, invoker);
@@ -104,6 +106,7 @@ abstract class DiscoveredOperationsFactory<O extends Operation> {
 		return invoker;
 	}
 
+	//给 具体类型的endpoint OperationsFactory来实现
 	protected abstract O createOperation(EndpointId endpointId, DiscoveredOperationMethod operationMethod,
 			OperationInvoker invoker);
 

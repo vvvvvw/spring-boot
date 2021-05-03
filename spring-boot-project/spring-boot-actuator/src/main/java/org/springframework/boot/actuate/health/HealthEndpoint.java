@@ -50,6 +50,7 @@ public class HealthEndpoint extends HealthEndpointSupport<HealthContributor, Hea
 		super(registry, groups);
 	}
 
+	//注意：基于web访问的时候 是不会走到这边的，因为基于web的实现放在了HealthEndpointWebExtension中
 	@ReadOperation
 	public HealthComponent health() {
 		HealthComponent health = health(ApiVersion.V3, EMPTY_PATH);

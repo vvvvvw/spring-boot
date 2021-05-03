@@ -53,12 +53,17 @@ class RequestPredicateFactory {
 
 	WebOperationRequestPredicate getRequestPredicate(String rootPath, DiscoveredOperationMethod operationMethod) {
 		Method method = operationMethod.getMethod();
+		//从方法中提取 有 @Selector注解的参数
 		Parameter[] selectorParameters = Arrays.stream(method.getParameters()).filter(this::hasSelector)
 				.toArray(Parameter[]::new);
+		//获取 有 @Selector注解且 注解的value是Match.ALL_REMAINING 的参数
 		Parameter allRemainingPathSegmentsParameter = getAllRemainingPathSegmentsParameter(selectorParameters);
+		//使用@Selector注解的参数构建路径： path = 端点路径/{参数名1}/{参数名2}/.../{*注解值为ALL_REMAINING的@Selector参数名}
 		String path = getPath(rootPath, selectorParameters, allRemainingPathSegmentsParameter != null);
 		WebEndpointHttpMethod httpMethod = determineHttpMethod(operationMethod.getOperationType());
+		//获取 输入 媒体类型
 		Collection<String> consumes = getConsumes(httpMethod, method);
+		//获取输出媒体类型
 		Collection<String> produces = getProduces(operationMethod, method);
 		return new WebOperationRequestPredicate(path, httpMethod, consumes, produces);
 	}

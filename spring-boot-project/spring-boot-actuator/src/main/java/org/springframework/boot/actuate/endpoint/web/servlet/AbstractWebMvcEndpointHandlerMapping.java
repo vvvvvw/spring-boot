@@ -77,12 +77,14 @@ import org.springframework.web.util.UrlPathHelper;
 public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappingInfoHandlerMapping
 		implements InitializingBean, MatchableHandlerMapping {
 
+	// 端点的映射路径前缀
 	private final EndpointMapping endpointMapping;
-
+	// MVC端点集合
 	private final Collection<ExposableWebEndpoint> endpoints;
 
 	private final EndpointMediaTypes endpointMediaTypes;
 
+	// CORS配置
 	private final CorsConfiguration corsConfiguration;
 
 	private final boolean shouldRegisterLinksMapping;
@@ -123,6 +125,9 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 		this.endpointMediaTypes = endpointMediaTypes;
 		this.corsConfiguration = corsConfiguration;
 		this.shouldRegisterLinksMapping = shouldRegisterLinksMapping;
+		// 默认情况下，处理静态资源的handlermapping的order是 LOWEST_PRECEDENCE - 1
+		//RequestMappingHandlerMapping的order是0
+		//所以我们希望本 handlermapping在这两个之前
 		setOrder(-100);
 	}
 
@@ -172,8 +177,10 @@ public abstract class AbstractWebMvcEndpointHandlerMapping extends RequestMappin
 		if (matchAllRemainingPathSegmentsVariable != null) {
 			path = path.replace("{*" + matchAllRemainingPathSegmentsVariable + "}", "**");
 		}
+		//actuator的WebOperation包装成可以处理servlet请求的ServletWebOperation
 		ServletWebOperation servletWebOperation = wrapServletWebOperation(endpoint, operation,
 				new ServletWebOperationAdapter(operation));
+		//注册mapping，创建供处理请求的mappinginfo和HandlerMethod
 		registerMapping(createRequestMappingInfo(predicate, path), new OperationHandler(servletWebOperation),
 				this.handleMethod);
 	}

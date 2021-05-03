@@ -55,6 +55,7 @@ public interface StatusAggregator {
 	 * @param statuses the statuses to aggregate
 	 * @return the aggregate status
 	 */
+	//将多个 Status聚合成一个status
 	Status getAggregateStatus(Set<Status> statuses);
 
 }

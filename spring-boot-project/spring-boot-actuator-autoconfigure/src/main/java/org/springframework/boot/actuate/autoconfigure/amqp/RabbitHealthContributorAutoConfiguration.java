@@ -46,6 +46,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitHealthContributorAutoConfiguration
 		extends CompositeHealthContributorConfiguration<RabbitHealthIndicator, RabbitTemplate> {
 
+	//创建rabbitmq的健康指示器
 	@Bean
 	@ConditionalOnMissingBean(name = { "rabbitHealthIndicator", "rabbitHealthContributor" })
 	public HealthContributor rabbitHealthContributor(Map<String, RabbitTemplate> rabbitTemplates) {

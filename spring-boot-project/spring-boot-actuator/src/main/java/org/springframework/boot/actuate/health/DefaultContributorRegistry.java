@@ -35,10 +35,12 @@ import org.springframework.util.Assert;
  */
 class DefaultContributorRegistry<C> implements ContributorRegistry<C> {
 
+	//名字工厂，就是一个 函数用来把 传入registerContributor函数的name参数转换一下，然后把转换后的 名字存入contributors中
 	private final Function<String, String> nameFactory;
 
 	private final Object monitor = new Object();
 
+	//key：通过nameFactory转换后的name，value：实例
 	private volatile Map<String, C> contributors;
 
 	DefaultContributorRegistry() {

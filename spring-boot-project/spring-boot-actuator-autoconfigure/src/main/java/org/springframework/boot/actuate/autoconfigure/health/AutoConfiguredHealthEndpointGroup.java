@@ -38,16 +38,21 @@ import org.springframework.util.CollectionUtils;
  */
 class AutoConfiguredHealthEndpointGroup implements HealthEndpointGroup {
 
+	//用于判断 指定的name 是否属于本group，IncludeExcludeGroupMemberPredicate和AutoConfiguredHealthEndpointGroups.ALL
 	private final Predicate<String> members;
 
+	//本group对应的健康信息聚合器
 	private final StatusAggregator statusAggregator;
 
+	//本group对应的HttpCodeStatusMapper
 	private final HttpCodeStatusMapper httpCodeStatusMapper;
 
 	private final Show showComponents;
 
 	private final Show showDetails;
 
+	//当showComponents或者showDetails的认证方式是Show.WHEN_AUTHORIZED(认证用户才能查看details或者各个子健康信息的时候)
+	//roles就用来表示 符合条件的认证用户
 	private final Collection<String> roles;
 
 	/**

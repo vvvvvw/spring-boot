@@ -34,6 +34,8 @@ import org.springframework.util.ObjectUtils;
  * @author Phillip Webb
  * @since 2.2.0
  */
+//实现逻辑：将传入的status列表按照Status.DOWN<Status.OUT_OF_SERVICE<Status.UP<Status.UNKNOWN 的顺序
+//排序，然后返回其中最小的status；如果所有status都不属于上述4种，则返回Status.UNKNOWN
 public class SimpleStatusAggregator implements StatusAggregator {
 
 	private static final List<String> DEFAULT_ORDER;
